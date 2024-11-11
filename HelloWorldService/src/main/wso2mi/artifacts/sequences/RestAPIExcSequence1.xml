@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence name="RestAPIExcSequence1" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
-    <property name="userIDValue" scope="default" type="STRING" expression="uri.val.userId"/>
+    <property name="userIDValue" scope="default" type="STRING" expression="get-property('uri.var.userId')"/>
     <property name="isUserAllowed" scope="default" type="BOOLEAN" expression="json-eval($.userAllowed)"/>
     <log category="INFO" level="custom">
         <property name="PrintUserId" expression="$ctx:userIDValue"/>
@@ -8,4 +8,12 @@
     <log category="INFO" level="custom">
         <property name="IsUserAllowed" expression="$ctx:userAllowed"/>
     </log>
+    <property name="messageString" scope="default" type="STRING" expression="concat('User with', $ctx:userIDValue, 'is', $ctx:isUserAllowed)"/>
+    <payloadFactory media-type="json" template-type="default">
+        <format>{"message":$1}</format>
+        <args>
+            <arg expression="$ctx:messageString" evaluator="xml"/>
+        </args>
+    </payloadFactory>
+    <respond/>
 </sequence>
